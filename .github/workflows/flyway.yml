@@ -1,0 +1,46 @@
+name: Flyway Database Setup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  flyway:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: mydatabase
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Flyway
+        run: |
+          curl -L -o flyway.zip https://flywaydb.org/download/community/flyway-commandline-8.5.11-linux-x64.zip
+          unzip flyway.zip
+          sudo mv flyway-8.5.11 /usr/local/flyway
+          sudo ln -s /usr/local/flyway/flyway /usr/local/bin
+
+      - name: Configure Flyway
+        run: |
+          echo "flyway.url=jdbc:postgresql://localhost:5432/mydatabase" >> /usr/local/flyway/conf/flyway.conf
+          echo "flyway.user=postgres" >> /usr/local/flyway/conf/flyway.conf
+          echo "flyway.password=password" >> /usr/local/flyway/conf/flyway.conf
+          echo "flyway.locations=filesystem:sql" >> /usr/local/flyway/conf/flyway.conf
+
+      - name: Run Flyway Migrations
+        run: flyway migrate
