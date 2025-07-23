@@ -27,4 +27,4 @@ jobs:
           FLYWAY_USER: ${{ secrets.FLYWAY_USER }}
           FLYWAY_PASSWORD: ${{ secrets.FLYWAY_PASSWORD }}
         run: |
-          /opt/flyway/flyway migrate -configFiles=flyway.conf -locations=filesystem:./sql
+          /opt/flyway/flyway migrate -configFiles=flyway.conf -locations=filesystem:/sql
