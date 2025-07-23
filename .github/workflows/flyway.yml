@@ -1,4 +1,4 @@
-ame: Flyway Migration
+name: Flyway Migration
 
 on:
   workflow_dispatch:
